@@ -1,6 +1,6 @@
 # BrickVault OM
 
-```0.0.1```
+```1.0.0```
 
 ### *****All files in this project are required for the program to run properly*****
 
