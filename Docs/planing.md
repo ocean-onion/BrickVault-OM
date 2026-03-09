@@ -42,34 +42,39 @@ Terminal based. This will allow the program to fully focused on functionality ra
 <details>
 <summary> Class system</summary>
 
-A dedicated ```LegoSet``` class to define the properties of a set, and a Vault class to manage the list of objects.
+A dedicated LegoSet base class to define the properties shared by all sets, with two subclasses to handle specific types:
+
+- OwnedLegoSet: Extends Legoset with a built_status field to track whether the set has been built.
+- WantedLegoSet: Extends Legoset with a priority field to track how much the user wants the set.
+
+A VaultManager class manages the list of objects and handles all CRUD and search operations.
 
 </details>
 
 <details>
 <summary> CRUD Functionality</summary>
 
-**C**reate: Add a new set (Number, Name, Theme, Pieces). \
+**C**reate: Add a new owned or wanted Lego set with all details. \
 \
-**R**ead: List all sets currently in the vault. \
+**R**ead: Display all sets, or sets filtered by type, theme, year, price, pieces, status or priority. \
 \
-**U**pdate: Change the status of a set (e.g., "In Box" -> "Built"). \
+**U**pdate: Change any field on an existing set including name, theme, year, price, pieces, built status or priority. \
 \
-**D**elete: Remove a set from the inventory.
+**D**elete: Remove a set from the vault by name or set number.
 
 </details>
 
 <details>
 <summary> File Reading</summary>
 
-The system will use **JSON** to read and write data to a local file. This ensures the user's data remains after the program is closed.
+The system uses **JSON** to read and write data to local files. Sets are saved to a master sets.json file and automatically split into jsons/owned_sets.json and jsons/wanted_sets.json for organised storage. This ensures the user's data remains after the program is closed.
 
 </details>
 
 <details>
 <summary> Searching (Mid-tier Goal)</summary>
   
-A feature to find specific sets by searching for keywords in the **Name** or **Theme** (e.g., searching "Star Wars" lists all matching sets).
+Search by name or set number, theme (**fuzzy matching**), year, price range, piece count, built status, and priority.
 
 </details>
 
@@ -115,7 +120,8 @@ json: For data serialization (saving objects to text). \
 os: For checking if files exist and handling file paths. \
 datetime: To record the date a set was added to the collection. \
 sys: For exiting the program cleanly. \
-ooomutils: For styling and fun.
+ooomutils: For styling and fun. \
+thefuzz: Improved searching functionality.
 
 </details>
 
@@ -137,15 +143,31 @@ Version Control: Replit/Github
 <summary> 1. models.py (The Object)</summary>
   
 ```
-Class: LegoSet
+Class: Legoset (Base Class)
   Attributes:
     set_num (Integer): The official LEGO number.
     name (String): The name of the set.
     theme (String): The category (e.g., City, Technic).
     pieces (Integer): Number of parts.
+    year (Integer): The year the set was released.
+    price (Float): The price of the set.
+    type (String): Whether the set is owned or wanted.
   Methods:
-    __str__(): Returns a formatted string for easy printing.
-    update_status(): Toggles between "Built" and "In Box".
+    display(): Displays set attributes in a formatted ASCII box.
+
+Class: OwnedLegoSet (Inherits Legoset)
+  Attributes:
+    built_status (String): Whether the set has been built.
+  Methods:
+    update_built_status(new_status): Updates the built status.
+    display(): Overrides base display to include built status.
+
+Class: WantedLegoSet (Inherits Legoset)
+  Attributes:
+    priority (String): How much the user wants the set.
+  Methods:
+    update_priority(new_priority): Updates the priority.
+    display(): Overrides base display to include priority.
 ```
 </details>
 
@@ -155,12 +177,16 @@ Class: LegoSet
 ```
 Class: VaultManager
 Attributes:
-  sets_list (List): A list containing LegoSet objects.
+  set_list (List): A list containing Legoset objects.
 Methods:
-  add_set(lego_set_object): Adds a new object to the list.
-  remove_set(set_num): Finds and removes a set.
-  search_by_theme(keyword): Returns a filtered list.
-  sort_by_pieces(): Reorders the list based on count.
+  add_set(lego_set): Adds a new set, checks for duplicates.
+  rm_set(set_trm): Finds and removes a set by name or number.
+  update_set_name/theme/year/price/pieces(set_num, value): Updates a field.
+  update_set_status(set_num, new_status): Updates built status.
+  update_set_priority(set_num, new_priority): Updates priority.
+  change_set_type(set_num): Switches a set between owned and wanted.
+  get_sbn/sbnum/sbt/sby/sbpr/sbpc/sbst(filter): Returns filtered sets.
+  get_sc/scbt/scby/scbpr/scbpc/scbst(filter): Returns set counts.
 ```
 
 </details>
@@ -170,8 +196,12 @@ Methods:
 
 ```
 Functions:
-  save_to_json(filename, data_list): Converts objects to dictionaries and saves to file.
-  load_from_json(filename): Reads file and recreates objects.
+save_to_json(vault_manager, filename): Saves all sets to a single JSON file.
+load_from_json(vault_manager, filename): Reads file and recreates the correct
+  subclass (OwnedLegoSet or WantedLegoSet) based on the type field.
+  Handles missing or empty files gracefully.
+update_split_files(vault_manager): Splits the set list into
+  owned_sets.json and wanted_sets.json and saves all sets to sets.json.
 ```
 
 </details>
@@ -181,8 +211,9 @@ Functions:
   
 ```
 Functions:
-  main_loop(): Captures user input and calls the appropriate function from VaultManager.
-  display_menu(): Shows text options to the user.
+  DoLoadingScreen(): Displays the loading screen on startup.
+  main(): Runs the main loop, handles menu navigation and calls
+    the appropriate VaultManager functions based on user input.
 ```
 
 </details>
