@@ -281,13 +281,19 @@ Didnt know how to implement inheritance into the existing project. Single Legose
 Restructured models.py into a proper inheritance hierarchy with Legoset as the base class and OwnedLegoSet and WantedLegoSet as subclasses each with their own unique attributes and display methods. Updated load_from_json to check the type field and create the correct subclass instead of always creating a base Legoset. Fixed all bugs that arose from the refactor including built_status assignment, **legoset fix, attribute name fixes, save function replacement, hardcoded type values, shared vault_manager via self.vault_manager, for loop indentation, update_menu_wanted dedent, update_menu creation, StatusInput to BuiltStatusInput, removed try/except from validate methods, and added file existence checks to load_from_json.
 ```
 
-### 5. Tools Used
+### 5. Testing
+
+```
+Ran the program and attempted to add the Millennium Falcon (set 75192) as an owned set to verify the inheritance structure was working correctly and sets were saving to the correct JSON files.
+```
+
+### 6. Tools Used
 
 ```
 Replit, Claude AI, ChatGPT
 ```
 
-### 6. Evidence
+### 7. Evidence
 
 
 * #### Evidence video/photo file path:
@@ -295,9 +301,201 @@ Replit, Claude AI, ChatGPT
 ```
 Docs/Evidence/Log_6_Evid_1.mov
 ```
+* #### Code snippet - Inheritance structure:
+
+```
+class Legoset:
+    def __init__(self, pieces, name, theme, set_num, year, price, type):
+        self.pieces = pieces
+        self.name = name
+        self.theme = theme
+        self.set_num = set_num
+        self.year = year
+        self.price = price
+        self.type = type
+
+class OwnedLegoSet(Legoset):
+    def __init__(self, pieces, name, theme, set_num, year, price, type, status):
+        super().__init__(pieces, name, theme, set_num, year, price, type)
+        self.built_status = status
+
+class WantedLegoSet(Legoset):
+    def __init__(self, pieces, name, theme, set_num, year, price, type, priority):
+        super().__init__(pieces, name, theme, set_num, year, price, type)
+        self.priority = priority
+```
+
+### 7. What I am working on next
+
+```
+Continue fixing remaining runtime bugs, complete the search and count pages, and ensure all JSON files are saving and loading correctly with the new inheritance structure.
+```
+
+### 8. Thoughts and Feelings
+
+```
+Took a long time today but the program is in a much better state. Understanding why vault_manager wasnt being shared between display and main was a good learning moment. The inheritance refactor made the code a lot cleaner and more logical.
+```
+
+### 9. Tool Use
+
+```
+Claude AI - Used to work through bugs to understand why each one was happening rather than just being given the fix.
+ChatGPT - Used to research how to implement inheritance into the existing project structure and understand how subclasses work with JSON loading.
+```
 
 ### 7. Time Spent
 
 ```
 360 Minutes
 ```
+
+```Log_07```
+
+## Date: ```Tue 10/3/26```
+
+### 1. Task / Goal
+
+```
+Add new search and count features, refactor display method using inheritance, 
+improve change_set_type logic and general code cleanup.
+```
+
+### 2. What I Got Stuck On
+
+```
+display() method was duplicated across OwnedLegoSet and WantedLegoSet with only 
+the extra fields different. change_set_type was only changing the type string but 
+not updating the set attributes to match the new type and removing the old objects. get_sbsbt was named 
+incorrectly and not matching what main was calling.
+```
+
+### 3. How I Fixed It
+
+```
+Refactored display() into the base Legoset class using a new extra_lines_display() 
+method that subclasses override to add their own fields. This removed all duplicate 
+display code across OwnedLegoSet and WantedLegoSet. Fixed change_set_type to delete 
+the old attribute and add the correct new one when switching between owned and wanted. 
+Renamed get_sbsbt to get_sbbst and fixed all method names to match what main was 
+calling. Added new search methods get_sbbst, get_sbpt, get_sbty and new count methods 
+get_scbbst, get_scpt, get_scty to vault_logic.py. Added search by type, search by 
+priority, display all sets to the search page and count by type, count by priority 
+to the count page in main.py. Renamed menu options to be more specific 
+e.g. "Add a Owned set" instead of "Add a Lego set". Renamed header from 
+LEGO SET VAULT to BRICK SET VAULT in page_logic.py (Will continue to fixes naming like this through out the project while testing. I know alot of the naming is mixed up).
+```
+
+### 4. Testing
+
+```
+Ran the program and tested search by built status, search by priority and search 
+by type to verify new vault_logic methods were working correctly. Tested 
+change_set_type to verify attributes were being correctly swapped when switching 
+between owned and wanted.
+```
+
+### 5. Evidence
+
+* #### Code snippet - extra_lines_display refactor (Polymorphism):
+```python
+class Legoset:
+  def extra_lines_display(self, width):
+    return []
+
+class OwnedLegoSet(Legoset):
+  def extra_lines_display(self, width):
+    statusprint = self.built_status.replace("_", " ").title()
+    return [f"│ Built Status  : {statusprint:<{width - len('Built Status  : ') - 1}}│"]
+
+class WantedLegoSet(Legoset):
+  def extra_lines_display(self, width):
+    priorityprint = self.priority.replace("_", " ").title()
+    return [f"│ Priority  : {priorityprint:<{width - len('Priority  : ') - 1}}│"]
+```
+
+* #### Code snippet - change_set_type fix:
+```python
+def change_set_type(self, set_num):
+  for lego_set in self.set_list:
+    if lego_set.set_num == set_num:
+      if lego_set.type == "owned":
+        lego_set.type = "wanted"
+        if hasattr(lego_set, "built_status"):
+          del lego_set.built_status
+        lego_set.priority = "mid"
+      elif lego_set.type == "wanted":
+        lego_set.type = "owned"
+        if hasattr(lego_set, "priority"):
+          del lego_set.priority
+        lego_set.built_status = "unbuilt"
+      return True
+```
+
+* #### Code snippet - new search and count methods:
+```python
+def get_sbbst(self, built_status):
+  result = [lego_set for lego_set in self.set_list
+            if lego_set.built_status == built_status]
+  return self.query_results_check(result, "built status", built_status)
+
+def get_sbpt(self, priority):
+  result = [lego_set for lego_set in self.set_list
+            if lego_set.priority == priority]
+  return self.query_results_check(result, "priority", priority)
+
+def get_sbty(self, type):
+  result = [lego_set for lego_set in self.set_list if lego_set.type == type]
+  return self.query_results_check(result, "type", type)
+```
+
+
+### 6. OOP Concepts Demonstrated Today
+
+#### Polymorphism
+```
+extra_lines_display() is defined in the base Legoset class but overridden in 
+OwnedLegoSet and WantedLegoSet to return different fields. When display() calls 
+self.extra_lines_display(width) it doesnt need to know which subclass it is — 
+the correct version runs automatically.
+```
+
+#### Encapsulation
+```
+VaultManager mashes set_list and all methods that operate on it into one class. 
+External code like main.py never touches set_list directly. It always goes 
+through methods like add_set(), rm_set(), get_sbbst().
+```
+
+#### Abstraction
+```
+Validator500000000 abstracts all input validation so main.py just calls 
+get_set_name() or get_price() without knowing anything about how validation 
+works internally. Similarly query_results_check() in VaultManager hides the 
+error raising logic so every search method just calls it instead of repeating 
+the same check.
+```
+
+### 7. What I Am Working On Next
+```
+Implement sorting functionality and 
+continue testing all features.
+```
+
+### 8. Thoughts and Feelings
+```
+The extra_lines_display refactor was a good improvement, the display code is 
+much cleaner now. The change_set_type was fustrating because I didn't understand how to remove a full object only change it but I'm glas I figured it out it makes the system also more adaptable.
+```
+
+### 9. Tool Use
+```
+Google
+```
+
+### 10. Time Spent
+```
+240 Minutes
+```
+
+

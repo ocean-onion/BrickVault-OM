@@ -16,7 +16,7 @@
 * **sby:** Sets by year
 * **sbypr:** Sets by price range
 * **sbypc:** Sets by piece count
-* **sbst:** Sets by status
+* **sbbst:** Sets by built status
 
 ---
 
@@ -26,7 +26,7 @@
 * **scby:** Set count by year
 * **scbpr:** Set count by price range
 * **scbpc:** Set count by piece count
-* **scbst:** Set count by status
+* **scbbst:** Set count by built status
 
 ---
 

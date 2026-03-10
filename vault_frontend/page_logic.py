@@ -28,7 +28,7 @@ class MenuDisplay:
         ooomutils.wait(3)
         ooomutils.clear()
         print(f"\n┌{'─' * self.width}┐")
-        print(f"│ {'LEGO SET VAULT':<{self.width-1}}│")
+        print(f"│ {'BRICK SET VAULT':<{self.width-1}}│")
         print(f"│ {page.title:<{self.width-1}}│")
         print(f"│ {'Page ' + str(self.current_page + 1) + ' of ' + str(total):<{self.width-1}}│")
         print(f"├{'─' * self.width}┤")
