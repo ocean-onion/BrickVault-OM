@@ -11,21 +11,22 @@ Legoset
 │   ├── price (Float)
 │   └── type (String)
 ├── Methods
-│   └── display()
+│   ├── display()
+│   └── extra_lines_display(width)
 │
 ├── OwnedLegoSet (inherits Legoset)
 │   ├── Attributes
 │   │   └── built_status (String)
 │   └── Methods
 │       ├── update_built_status(new_status)
-│       └── display()
+│       └── extra_lines_display(width)
 │
 └── WantedLegoSet (inherits Legoset)
     ├── Attributes
     │   └── priority (String)
     └── Methods
         ├── update_priority(new_priority)
-        └── display()
+        └── extra_lines_display(width)
 
 ─────────────────────────────────────────
 
@@ -40,8 +41,11 @@ VaultManager
     ├── update_set_status(set_num, new_status)
     ├── update_set_priority(set_num, new_priority)
     ├── change_set_type(set_num)
-    ├── get_sbn/sbnum/sbt/sby/sbpr/sbpc/sbst(filter)
-    └── get_sc/scbt/scby/scbpr/scbpc/scbst(filter)
+    ├── get_sbn/sbnum/sbt/sby/sbpr/sbpc(filter)
+    ├── get_sbbst/sbpt/sbty(filter)
+    ├── get_sets()
+    ├── get_sc/scbt/scby/scbpr/scbpc(filter)
+    └── get_scbbst/scpt/scty(filter)
 
 ─────────────────────────────────────────
 
