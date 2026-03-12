@@ -113,7 +113,8 @@ class BuiltStatusInput(ValidateInput):
   @staticmethod
   def validate(value):
     sta = value
-    if not sta.replace(" ", "").isalpha():
+    accepted = ["built", "unbuilt"]
+    if not sta.replace(" ", "").isalpha() and sta not in accepted:
       raise BuiltStatusError(
           f"You typed {sta} which is not a status formatted correctly (Built). Please try again."
       )
@@ -125,7 +126,8 @@ class OwnedStatusInput(ValidateInput):
   @staticmethod
   def validate(value):
     sta = value
-    if not sta.replace(" ", "").isalpha():
+    accepted = ["owned", "wanted"]
+    if not sta.replace(" ", "").isalpha() and sta not in accepted:
       raise OwnedStatusError(
           f"You typed {sta} which is not a status formatted correctly (Owned). Please try again."
       )
@@ -136,7 +138,8 @@ class PriorityInput(ValidateInput):
   @staticmethod
   def validate(value):
     sta = value
-    if not sta.replace(" ", "").isalpha():
+    accepted = ["low", "medium", "high"]
+    if not sta.replace(" ", "").isalpha() and sta not in accepted:
       raise PriorityStatusError(
           f"You typed {sta} which is not a status formatted correctly (High). Please try again."
       )

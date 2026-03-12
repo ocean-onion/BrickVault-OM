@@ -498,4 +498,146 @@ Google
 240 Minutes
 ```
 
+---
 
+```Log_07```
+
+## Date: ```Thu 12/3/26```
+
+### 1. Task / Goal
+
+```
+Fix bugs
+```
+
+### 2. Reason
+
+```
+To ensure all functions are running correctly before submission
+```
+
+### 3. Problems Encountered
+
+```
+UpdateSetLogic was being called incorrectly — update_menu_wanted() was receiving extra positional arguments, causing a TypeError. Validator conditions for BuiltStatusInput, OwnedStatusInput, and PriorityInput weren't checking for the correct words as in acceptable statuses
+
+```
+
+### 4. Solutions
+
+```
+
+```
+
+### 5. Tools Used
+
+```
+Replit
+```
+
+### 6. ~~Evidence~~
+
+```
+
+```
+
+### 7. Time Spent
+
+```
+120 minutes
+```
+
+---
+
+```Log_08```
+
+## Date: ```Thu 12/3/26```
+
+### 1. Task / Goal
+
+```
+Fix UpdateSetLogic not being called correctly, add accepted value lists to 
+validators.
+```
+
+### 2. What I Got Stuck On
+
+```
+UpdateSetLogic was being instantiated but update_menu() was never being called, 
+so the update menu never appeared. Found this through testing in T04 which showed 
+a TypeError because the old code was calling update_menu_wanted() directly on the 
+class instead of on an instance, passing vault_manager as the first argument instead 
+of self.
+```
+
+### 3. How I Fixed It
+
+```
+Fixed the UpdateSetLogic call in main.py to properly instantiate the object and 
+then call update_menu() on it. Changed from:
+    UpdateSetLogic(vault_manager, set_to_update)
+To:
+    updater = UpdateSetLogic(vault_manager, set_to_update)
+    updater.update_menu()
+This fix was applied to both page 0 and page 1 in main.py. Also added accepted 
+value lists to BuiltStatusInput, OwnedStatusInput and PriorityInput validators in 
+error_handler.py so validation is more explicit. Deleted loading_screen.py as the loading 
+screen is now handled by ooomutils.
+```
+
+### 4. Testing
+
+```
+Ran T03 - Display all sets on empty vault, NoSetsFoundError was raised correctly. 
+Ran T04 - Update theme of wanted set, failed before fix with TypeError, passed 
+after fix with theme updating correctly and saving to wanted_sets.json.
+```
+
+### 5. Evidence
+
+* #### Code snippet - UpdateSetLogic fix:
+```python
+# Before
+UpdateSetLogic(vault_manager, set_to_update)
+
+# After
+updater = UpdateSetLogic(vault_manager, set_to_update)
+updater.update_menu()
+```
+
+* #### Code snippet - accepted values added to validators:
+
+```python
+class BuiltStatusInput(ValidateInput):
+  @staticmethod
+  def validate(value):
+    sta = value
+    accepted = ["built", "unbuilt"]
+    if not sta.replace(" ", "").isalpha() and sta not in accepted:
+```
+
+
+### 6. What I Am Working On Next
+
+```
+Continue testing remaining features, implement sorting functionality.
+```
+
+### 7. Thoughts and Feelings
+
+```
+The UpdateSetLogic bug was tricky because it wasnt crashing on the instantiation 
+line, only when the function was called incorrectly.
+```
+
+### 8. Tool Use
+
+```
+Replit, Google
+```
+
+### 9. Time Spent
+
+```
+120 Minutes
+```

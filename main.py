@@ -13,7 +13,7 @@ ErrorName.logging = True
 
 def DoLoadingScreen():
     doloadingscreen = True
-    name = "Lego Set Vault"
+    name = "Brick Set Vault"
     if doloadingscreen:
         ooomutils.loading_screen(name)
 
@@ -62,7 +62,7 @@ def main():
     while True:
         result = menu.run()
         if not result:
-            print("Exiting the Lego Set Vault. Goodbye!")
+            print("Exiting the Brick Set Vault. Goodbye!")
             break
 
         page, choice = result
@@ -107,7 +107,8 @@ def main():
                     sets = vault_manager.get_sbnum(set_to_update)
                     for lego_set in sets:
                         print(lego_set.display())
-                    UpdateSetLogic(vault_manager, set_to_update)
+                    updater = UpdateSetLogic(vault_manager, set_to_update)
+                    updater.update_menu()
 
                 elif choice == '5':
                     set_to_change = Validator500000000.get_set_number(
@@ -155,7 +156,8 @@ def main():
                     sets = vault_manager.get_sbnum(set_to_update)
                     for lego_set in sets:
                         print(lego_set.display())
-                    UpdateSetLogic(vault_manager, set_to_update)
+                    updater = UpdateSetLogic(vault_manager, set_to_update)
+                    updater.update_menu()
 
                 elif choice == '5':
                     set_to_change = Validator500000000.get_set_number(
