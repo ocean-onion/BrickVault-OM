@@ -8,12 +8,14 @@ class VaultManager:
     def __init__(self, set_list):
         self.set_list = set_list
 
+    # Returns True if a set with the given number already exists
     def is_duplicate(self, set_num):
         for lego_set in self.set_list:
             if lego_set.set_num == set_num:
                 return True
         return False
 
+    # Raises an error if a search returned no results
     def query_results_check(self, results, filter, input):
         if not results:
             raise NoSetsFoundError(
@@ -21,6 +23,7 @@ class VaultManager:
             )
         return results
 
+    # Raises an error if a count returned zero
     def count_results_check(self, count, filter, input):
         if count == 0:
             raise NoSetsFoundError(
@@ -28,6 +31,7 @@ class VaultManager:
             )
         return count
 
+    # Adds a set to the vault if no duplicate set number exists
     def add_set(self, new_set):
         if self.is_duplicate(new_set.set_num):
             print(f"Set {new_set.set_num} already exists in the vault.")
@@ -36,6 +40,7 @@ class VaultManager:
             self.set_list.append(new_set)
             return True
 
+    # Removes a set by set number or name
     def rm_set(self, set_trm):
         for i, lego_set in enumerate(self.set_list):
             if lego_set.set_num == set_trm or lego_set.name == set_trm:
@@ -44,6 +49,8 @@ class VaultManager:
         raise NoSetsFoundError(
             f"There are no sets in the vault with set number or name {set_trm}."
         )
+
+    # --- Update methods ---
 
     def update_set_num(self, set_num, new_set_num):
         for lego_set in self.set_list:
@@ -93,6 +100,7 @@ class VaultManager:
                 return True
         raise NoSetsFoundError(f"There are no sets in the vault with number {set_num}.")
 
+    # Converts a set between owned and wanted by replacing it with the correct subclass
     def change_set_type(self, set_num):
         for i, lego_set in enumerate(self.set_list):
             if lego_set.set_num == set_num:
@@ -129,7 +137,6 @@ class VaultManager:
             if lego_set.set_num == set_num:
                 lego_set.price = new_price
                 return True
-
         raise NoSetsFoundError(f"There are no sets in the vault with number {set_num}.")
 
     def update_set_pieces(self, set_num, new_pieces):
@@ -139,8 +146,9 @@ class VaultManager:
                 return True
         raise NoSetsFoundError(f"There are no sets in the vault with number {set_num}.")
 
-    # Get sets by name
+    # --- Search methods (return matching sets) ---
 
+    # Fuzzy search by name
     def get_sbn(self, name):
         sbn_qr = []
         for lego_sets in self.set_list:
@@ -149,6 +157,7 @@ class VaultManager:
                 sbn_qr.append(lego_sets)
         return self.query_results_check(sbn_qr, "name", name)
 
+    # Exact match by set number
     def get_sbnum(self, set_num):
         sbnum_qr = []
         for lego_set in self.set_list:
@@ -156,8 +165,7 @@ class VaultManager:
                 sbnum_qr.append(lego_set)
         return self.query_results_check(sbnum_qr, "set number", set_num)
 
-    # Get sets by one filter
-
+    # Fuzzy search by theme
     def get_sbt(self, theme):
         sbt_qr = []
         for lego_set in self.set_list:
@@ -188,6 +196,7 @@ class VaultManager:
             result, "piece count", f"{min_pieces} and {max_pieces}"
         )
 
+    # hasattr guards against searching owned sets for priority (and vice versa)
     def get_sbbst(self, built_status):
         result = [
             lego_set
@@ -213,7 +222,7 @@ class VaultManager:
         result = self.set_list
         return self.query_results_check(result, "sets", "all")
 
-    # Get set counts
+    # --- Count methods (return ithe number of sets in that with that attr) ---
 
     def get_sc(self):
         result = len(self.set_list)

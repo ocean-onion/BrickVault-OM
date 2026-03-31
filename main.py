@@ -12,7 +12,7 @@ from vault_frontend.page_logic import MenuDisplay, MenuPage
 from vault_frontend.update_set_logic import UpdateSetLogic
 
 ooomutils.auto_update(printcheck=False, confirm=True, warn_on_breaking=True)
-ErrorName.logging = True
+ErrorName.logging = True  # Enable error logging with timestamps
 
 
 def DoLoadingScreen():
@@ -27,6 +27,7 @@ def main():
     DoLoadingScreen()
     ooomutils.wait(2)
 
+    # Define the menu pages and their options
     menu = MenuDisplay(
         vault_manager,
         [
@@ -80,6 +81,7 @@ def main():
         ],
     )
 
+    # Main loop - runs until the user exits
     while True:
         result = menu.run()
         if not result:
@@ -88,8 +90,10 @@ def main():
 
         page, choice = result
         try:
+            # --- Page 0: Manage Owned Sets ---
             if page == 0:
                 if choice == "1":
+                    # Collect all fields then create and add an OwnedLegoSet
                     set_num = Validator500000000.get_set_number(
                         "Enter the set number: "
                     )
@@ -109,7 +113,6 @@ def main():
                         pieces, name, theme, set_num, year, price, "owned", status
                     )
                     success = vault_manager.add_set(lego_set)
-
                     if success:
                         update_split_files(vault_manager)
                         print("Lego set added successfully!")
@@ -140,14 +143,17 @@ def main():
                     updater.update_menu()
 
                 elif choice == "5":
+                    # Convert owned set to wanted
                     set_to_change = Validator500000000.get_set_number(
                         "Enter the set number of the set to change: "
                     )
                     vault_manager.change_set_type(set_to_change)
                     update_split_files(vault_manager)
 
+            # --- Page 1: Manage Wanted Sets ---
             elif page == 1:
                 if choice == "1":
+                    # Collect all fields then create and add a WantedLegoSet
                     set_num = Validator500000000.get_set_number(
                         "Enter the set number: "
                     )
@@ -167,7 +173,6 @@ def main():
                         pieces, name, theme, set_num, year, price, "wanted", priority
                     )
                     success = vault_manager.add_set(lego_set)
-
                     if success:
                         update_split_files(vault_manager)
                         print("Lego set added successfully!")
@@ -198,6 +203,7 @@ def main():
                     updater.update_menu()
 
                 elif choice == "5":
+                    # Convert wanted set to owned
                     set_to_change = Validator500000000.get_set_number(
                         "Enter the set number of the set to change: "
                     )
@@ -205,8 +211,10 @@ def main():
                     update_split_files(vault_manager)
                     print("Lego set changed successfully!")
 
+            # --- Page 2: Search Sets ---
             elif page == 2:
                 if choice == "1":
+                    # Routes to number or name search based on input type
                     sfs = Validator500000000.get_set_search(
                         "Enter the name or number of the set to search for: "
                     )
@@ -283,6 +291,7 @@ def main():
                     for lego_set in sets:
                         print(lego_set.display())
 
+            # --- Page 3: Count Sets ---
             elif page == 3:
                 if choice == "1":
                     print(f"Total number of Lego sets: {vault_manager.get_sc()}")
@@ -345,6 +354,7 @@ def main():
                         f"Number of Lego sets with type '{type}': {vault_manager.get_scty(type)}"
                     )
 
+        # Catch expected errors and display them without crashing
         except (NoSetsFoundError, MenuError) as e:
             print(e)
         input("\nPress Enter to continue...")
