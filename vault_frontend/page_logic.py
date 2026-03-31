@@ -1,4 +1,4 @@
-import ooomutils
+from ooomutils import color,wait, clear
 from vault_backend.input_handlers.error_handler import MenuError, MenuInput
 from vault_backend.file_handler import load_from_json
 from vault_backend.vault_logic import VaultManager
@@ -17,29 +17,65 @@ class MenuDisplay:
 
     def display(self):
         page = self.pages[self.current_page]
+
         if self.current_page == 0:
             load_from_json(self.vault_manager, "jsons/owned_sets.json")
         elif self.current_page == 1:
             load_from_json(self.vault_manager, "jsons/wanted_sets.json")
         else:
-             load_from_json(self.vault_manager, "jsons/sets.json")
-        
+            load_from_json(self.vault_manager, "jsons/sets.json")
+
         total = len(self.pages)
-        ooomutils.wait(3)
-        ooomutils.clear()
-        print(f"\n┌{'─' * self.width}┐")
-        print(f"│ {'BRICK SET VAULT':<{self.width-1}}│")
-        print(f"│ {page.title:<{self.width-1}}│")
-        print(f"│ {'Page ' + str(self.current_page + 1) + ' of ' + str(total):<{self.width-1}}│")
-        print(f"├{'─' * self.width}┤")
+
+        wait(3)
+        clear()
+
+        print(f"\n{color.CYAN}┌{'─' * self.width}┐")
+
+        print(
+            f"{color.CYAN}│{color.END}"
+            f"{color.YELLOW} {'BRICK SET VAULT':<{self.width-1}}"
+            f"{color.END}{color.CYAN}│"
+        )
+
+        print(
+            f"{color.CYAN}│{color.END}"
+            f" {page.title:<{self.width-1}}"
+            f"{color.CYAN}│"
+        )
+
+        print(
+            f"{color.CYAN}│{color.END}"
+            f" {'Page ' + str(self.current_page + 1) + ' of ' + str(total):<{self.width-1}}"
+            f"{color.CYAN}│"
+        )
+
+        print(f"{color.CYAN}├{'─' * self.width}┤")
+
         for option in page.options:
-            print(f"│ {option:<{self.width-1}}│")
-        print(f"├{'─' * self.width}┤")
-        print(f"│ {'N. Next page':<{self.width-1}}│")
-        print(f"│ {'P. Prev page':<{self.width-1}}│")
-        print(f"│ {'G. Go to page':<{self.width-1}}│")
-        print(f"│ {'X. Exit':<{self.width-1}}│")
-        print(f"└{'─' * self.width}┘")
+            print(
+                f"{color.CYAN}│{color.END}"
+                f" {option:<{self.width-1}}"
+                f"{color.CYAN}│"
+            )
+
+        print(f"{color.CYAN}├{'─' * self.width}┤")
+
+        nav_options = [
+            "N. Next page",
+            "P. Prev page",
+            "G. Go to page",
+            "X. Exit",
+        ]
+
+        for nav in nav_options:
+            print(
+                f"{color.CYAN}│{color.END}"
+                f" {nav:<{self.width-1}}"
+                f"{color.CYAN}│"
+            )
+
+        print(f"{color.CYAN}└{'─' * self.width}┘{color.END}")
             
 
     def next_page(self):

@@ -500,7 +500,7 @@ Google
 
 ---
 
-```Log_07```
+```Log_08```
 
 ## Date: ```Thu 12/3/26```
 
@@ -579,10 +579,6 @@ then call update_menu() on it. Changed from:
 To:
     updater = UpdateSetLogic(vault_manager, set_to_update)
     updater.update_menu()
-This fix was applied to both page 0 and page 1 in main.py. Also added accepted 
-value lists to BuiltStatusInput, OwnedStatusInput and PriorityInput validators in 
-error_handler.py so validation is more explicit. Deleted loading_screen.py as the loading 
-screen is now handled by ooomutils.
 ```
 
 ### 4. Testing
@@ -597,10 +593,6 @@ after fix with theme updating correctly and saving to wanted_sets.json.
 
 * #### Code snippet - UpdateSetLogic fix:
 ```python
-# Before
-UpdateSetLogic(vault_manager, set_to_update)
-
-# After
 updater = UpdateSetLogic(vault_manager, set_to_update)
 updater.update_menu()
 ```
@@ -641,3 +633,180 @@ Replit, Google
 ```
 120 Minutes
 ```
+
+---
+
+
+Log_09
+
+## Date: Fri 13/3/26
+
+### 1. Task / Goal
+
+Improve the reliability of the VaultManager system by fixing duplicate set handling, 
+refactoring the change_set_type method to properly use object replacement, 
+and strengthening search and filtering functions to prevent runtime errors. 
+Complete the final system testing and ensure all required test cases function correctly.
+
+### 2. Reason
+
+During testing, I found lots of stuff needed improvement. 
+Duplicate sets were correctly detected but the did not print if it did dectect. The 
+change_set_type method also required redesign to ensure that set types were 
+converted using proper object replacement rather than modifying attributes 
+directly. Additionally, filtering functions needed safeguards to prevent 
+errors when searching across different subclasses with different attributes.
+
+### 3. Problems Encountered
+
+Duplicate detection logic existed but required confirmation that the method 
+returned a true or false value so the main program could correctly determine whether 
+a set was successfully added instead of just printing either way.
+
+The original change_set_type behaviour risked leaving incorrect attributes on 
+objects when switching between owned and wanted sets, which could lead to 
+the project breaking.
+
+Search by functions built status or priority assumed all 
+objects had the same attributes. This created a potential runtime error when 
+searching mixed lists containing both OwnedLegoSet and WantedLegoSet.
+
+Final testing documentation also needed to be reviewed and verified to ensure 
+all core functionality worked reliably across normal, invalid, and edge-case 
+inputs.
+
+### 4. Solutions
+
+Confirmed that the add_set() method returns True when a set is successfully 
+added and False when a duplicate is detected. The main program now uses this 
+return value to control when success messages and file updates occur.
+
+Rewrote the change_set_type method to replace the existing object in the 
+set list with a new instance of the right subclass (OwnedLegoSet or 
+WantedLegoSet). This ensures that only the correct attributes exist on each 
+object after changing from Wanted or Owned.
+
+
+### 5. Testing
+
+Tested duplicate detection by attempting to add a set with an existing set 
+number to ensure duplicates are prevented and appropriate messages are shown.
+
+Tested change_set_type functionality to confirm that owned sets correctly 
+convert to wanted sets and wanted sets correctly convert to owned sets with 
+appropriate default attributes.
+
+Tested search functions using both exact matches and fuzzy matching to verify 
+reliable retrieval of sets even when names contain spelling errors.
+
+Tested filtering by price, year, theme, piece count, status, and priority to 
+confirm correct results and proper error handling when no matches exist.
+
+Tested behaviour when the vault is empty to confirm that NoSetsFoundError is 
+raised instead of returning invalid results.
+
+Tested saving and reloading data to confirm that JSON files persist correctly 
+between program sessions.
+
+Tested loading behaviour when JSON files are missing to confirm that the 
+system safely recreates required files.
+
+### 6. Evidence
+
+#### Code snippet — duplicate detection and safe add logic
+
+```python
+def add_set(self, new_set):
+    if self.is_duplicate(new_set.set_num):
+        print(f"Set {new_set.set_num} already exists in the vault.")
+        return False
+    else:
+        self.set_list.append(new_set)
+        return True
+```
+
+#### Code snippet — improved change_set_type method
+
+```python
+def change_set_type(self, set_num):
+    for i, lego_set in enumerate(self.set_list):
+        if lego_set.set_num == set_num:
+
+            if lego_set.type == "owned":
+                new_set = WantedLegoSet(
+                    lego_set.pieces,
+                    lego_set.name,
+                    lego_set.theme,
+                    lego_set.set_num,
+                    lego_set.year,
+                    lego_set.price,
+                    "wanted",
+                    "medium"
+                )
+
+            elif lego_set.type == "wanted":
+                new_set = OwnedLegoSet(
+                    lego_set.pieces,
+                    lego_set.name,
+                    lego_set.theme,
+                    lego_set.set_num,
+                    lego_set.year,
+                    lego_set.price,
+                    "owned",
+                    "unbuilt"
+                )
+
+            self.set_list[i] = new_set
+            return True
+
+    raise NoSetsFoundError(
+        f"There are no sets in the vault with set number {set_num}."
+    )
+```
+
+#### Code snippet — safe filtering using attribute checks
+
+```python
+def get_sbbst(self, built_status):
+    result = [
+        lego_set for lego_set in self.set_list
+        if hasattr(lego_set, "built_status")
+        and lego_set.built_status == built_status
+    ]
+    return self.query_results_check(result, "built status", built_status)
+```
+
+### 7. What I Am Working On Next
+
+Perform final system verification, review documentation for consistency, and 
+prepare the completed project for submission.
+
+### 8. Thoughts and Feelings
+
+Today's work significantly improved the reliability and stability of the system. 
+Refactoring the change_set_type method strengthened the object-oriented design 
+and ensured consistent behaviour when switching set types. Adding defensive 
+checks to filtering functions increased confidence that the program will handle 
+mixed data safely. The system now feels stable, predictable, and ready for final 
+submission testing.
+
+### 9. Tool Use
+
+Replit
+
+### 10. Time Spent
+
+210 Minutes
+
+
+# Reflection
+
+
+My project met its goals. The Brick Set Vault has a working inheritance hierarchy, reads and writes to split JSON files by set type, and all core features are functional.
+
+
+The biggest OOP lesson was that poor early design creates a lot of problems later. Refactoring from a single Legoset class into a proper hierarchy mid-project was frustrating but gave me a much better understanding of how inheritance actually works. For file handling I learned that Python doesn't always handle characters the way you expect, which I found out when symbols were saving as unicode escapes.
+
+
+The hardest part was fixing change_set_type. Replacing the whole object in the list with a new subclass instance instead of just deleting attributes off it was a key moment where I understood why clean object design matters.
+Next time I would plan the class diagram properly before writing any code. A lot of the bugs I ran into, like the circular import between files, could have been avoided if the structure was clearer from the start.

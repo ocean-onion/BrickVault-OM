@@ -1,3 +1,6 @@
+# Brick Vault Structure Tree
+
+```
 BrickVault OM/
 │
 ├── main.py
@@ -39,3 +42,4 @@ BrickVault OM/
     ├── loading_screen.py
     └── utils/
         └── logo.py
+```
